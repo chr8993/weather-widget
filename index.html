@@ -1,0 +1,103 @@
+<html>
+  <head>
+    <script src="./vue.min.js" type="text/javascript"></script>
+    <script src="./moment.min.js" type="text/javascript"></script>
+    <link href="./css/weather-icons.min.css" rel="stylesheet" type="text/css" />
+    <style>
+    #weather {
+      width: 100%;
+      height: 100%;
+      color: #fff;
+    }
+    #weather ul {
+      list-style-type: none;
+      margin: 0px;
+      width: 100%;
+      padding: 0px;
+    }
+    #weather ul li {
+      width: calc(20% - 10px);
+      float: left;
+      margin-right: 10px;
+      font-family: Helvetica;
+      text-align: center;
+    }
+    #weather ul li .day {
+      display: block;
+      margin-bottom: 15px;
+    }
+    #weather ul li i.wi {
+      font-size: 2.7em;
+    }
+    #weather ul li .temp {
+      display: block;
+      margin-top: 15px;
+    }
+    </style>
+  </head>
+  <body style="background: rgba(0,0,0,0); -webkit-app-region: drag;">
+    <div id="weather">
+      <ul>
+        <li v-for="day in forecast">
+          <span class="day">{{day.dt_txt | getDay}}</span>
+          <i v-bind:class="[icons[day.weather[0].main], 'wi']"></i>
+          <span class="temp">{{ day.main.temp | toFaren}}&deg;</span>
+        </li>
+      </ul>
+    </div>
+  </body>
+  <script type="text/javascript">
+  var apiKey = "2a81fd0e9e9779ca9d386be35e1514d9";
+  var apiUrl = "http://api.openweathermap.org/data/";
+  apiUrl += "2.5/forecast?id=4887398&appid=" + apiKey;
+
+  var weather = new Vue({
+  	el: "#weather",
+    data: {
+    	forecast: [],
+      icons: {
+      	'Clear': 'wi-day-sunny',
+        'Rain': 'wi-day-rain',
+        'Clouds': 'wi-day-cloudy'
+      }
+    },
+    created: function() {
+    	this.fetchWeather();
+    },
+    filters: {
+    	getDay: function(d) {
+      	var m = moment(d);
+        return m.format('ddd');
+      },
+      toFaren: function(d) {
+        var faren = d * (9/5)-459.67;
+      	return Math.floor(faren);
+      }
+    },
+    methods: {
+    	fetchDay: function() {},
+    	fetchWeather: function() {
+        var self = this;
+      	var xhr = new XMLHttpRequest();
+        xhr.open('GET', apiUrl);
+        xhr.onload = function() {
+          var res = JSON.parse(xhr.responseText);
+        	var list = res.list;
+          var check = {};
+          var count = 0;
+          list.map(function(a) {
+            var dt = moment(a.dt_txt);
+            var day = dt.format("MMDD");
+            if(!check[day] && (count < 5)) {
+              self.forecast.push(a);
+              check[day] = true;
+              count++;
+            }
+          });
+        };
+        xhr.send();
+      }
+    }
+  });
+  </script>
+</html>

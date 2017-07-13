@@ -1,0 +1,13 @@
+{
+  "name": "weather",
+  "version": "0.0.1",
+  "main": "index.html",
+  "window": {
+    "transparent": true,
+    "frame": false,
+    "toolbar": false,
+    "width": 500,
+    "height": 300,
+    "resizable": false
+  }
+}
